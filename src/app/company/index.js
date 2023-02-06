@@ -1,29 +1,11 @@
 import React, { useEffect } from 'react'
-import { useNavigate } from "react-router-dom";
-import { DataGrid } from '@mui/x-data-grid';
-import axios from 'axios';
 import ExpandableRowTable from './gridTable';
 import { Button, Grid, Modal, Backdrop, Box } from '@mui/material'
-
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
+import { Form } from 'react-router-dom';
 
 
 export default function Index() {
   const [open, setOpen] = React.useState(false);
-  // const [open, setOpen] = React.useState(false);
   const handleOpen = () => {
     setOpen(true);
   };
@@ -32,9 +14,7 @@ export default function Index() {
     setOpen(false);
   };
 
-  const navigate = useNavigate();
 
-  const [companyList, setCompanyList] = React.useState([]);
 
 
   return (
@@ -51,7 +31,7 @@ export default function Index() {
       <Box sx={{ width: '100%' }}>
 
 
-        <ExpandableRowTable />
+        {/* <ExpandableRowTable /> */}
 
 
         <Box>
@@ -65,17 +45,25 @@ export default function Index() {
           >
             <Box className="modal_wrapper">
               <h2>Add Company</h2>
+              <Form method='post' enctype="multipart/form-data">
               <Box style={{ height: 300, overflow: 'scroll' }}>
-                <input type={'text'} placeholder="Company Name" className='form-control' />
-                <input type={'text'} placeholder="Contact No" className='form-control' />
-                <input type={'text'} placeholder="Email ID" className='form-control' />
+              
+                <input type={'text'} placeholder="Company Name" name='subsidiarycompany' className='form-control' />
+                <input type={'text'} placeholder="Contact No" name="contactno" className='form-control' />
+                <input type={'text'} placeholder="Email ID" name="emailid" className='form-control' />
+                <input type={'text'} placeholder="Address" name="address" className='form-control' />
+                <input type={'text'} placeholder="Street" name="street" className='form-control' />
                 {/* <input type={'text'} placeholder="DB Name" className='form-control' /> */}
                 <input type={'text'} placeholder="Status" className='form-control' />
+                <input type="file" name="logo"></input>
+                
               </Box>
               <Box className='modalaction'>
                 <Button onClick={handleClose} className='btn cancel_btn'>Cancel</Button>
-                <Button className='btn submit_btn'>Submit</Button>
+                <Button className='btn submit_btn' type="submit">Submit</Button>
+                
               </Box>
+              </Form>
             </Box>
           </Modal>
         </Box>

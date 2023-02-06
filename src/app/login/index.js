@@ -1,21 +1,18 @@
 import { Button, Grid } from '@mui/material'
 import React, { useEffect } from 'react'
-import { useNavigate, Form, useRouteError } from "react-router-dom";
+import { useNavigate, Form, useRouteError , useActionData } from "react-router-dom";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 
 
 export default function Index() {
-    const navigate = useNavigate();
-    let error = useRouteError();
-  console.error(error);
 
-    const [companyList, setCompanyList] = React.useState([]);
+   const errors = useActionData();
+   
+    
+    console.log(errors);
 
-    const submitLogin = async (values) => {
-        await axios.post(`${process.env.REACT_APP_BASE_URL}//login`, values)
-    }
 
 
     return (
@@ -27,14 +24,15 @@ export default function Index() {
                     </Grid>
                     <Grid item md={6} className="login_right">
                         <h1>Login</h1>
-                        <Form method='post' action='/login' >
+                        { errors?.message }
+                        <Form method='post' >
                             <Box>
                                 <Box>Email </Box>
-                                <input type={'text'} value="test@gmail.com" className='form-control' />
+                                <input type={'text'}  name="email" className='form-control' />
                             </Box>
                             <Box>
                                 <Box>Password </Box>
-                                <input type={'password'} value="test@gmail.com" className='form-control' />
+                                <input type={'password'}  name="password" className='form-control' />
                             </Box>
                             <Box>
                                 <button type='submit' className='btn login_btn' variant='contained' fullWidth >Login</button>
@@ -46,3 +44,5 @@ export default function Index() {
         </div>
     )
 }
+
+
