@@ -6,7 +6,7 @@ const login = async ({ request, params }) => {
 
         switch (request.method) {
           case "POST": {
-            let formData = await request.formData();
+            let formData = await request.formData(); 
             try {
                let data = await loginService.login(formData)
                let resdata = data?.data?.message || []

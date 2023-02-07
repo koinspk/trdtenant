@@ -8,8 +8,16 @@ const create = async ({ request, params }) => {
           case "POST": {
             let formData = await request.formData();
             try {
-               await Services.companyCreate(formData)
-            //    return redirect('/')
+               let data =  await Services.companyCreate(formData);
+               let pstatus = data?.status || [];
+               console.log(data);
+              if(pstatus == 201){
+                let obj = {
+                  status : pstatus,
+                }
+                return obj
+              }
+               return redirect('/company')
             } catch (error) {
               console.log(error);
               let obj = {

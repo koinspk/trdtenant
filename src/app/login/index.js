@@ -24,12 +24,12 @@ export default function Index() {
                         <img src={require('../../assets/sales_img.png')} width="100%" />
                     </Grid>
                     <Grid item md={6} className="login_right">
-                            <Box sx={{ mb: 2 }}>
-                                <h2 component={'span'} style={{ marginBottom: 5 }}>Sign In to TSD </h2>
-                                <small style={{ marginTop: 0, marginBottom: 30 }}>Please login with your Username and Password</small>
-                            </Box>
+                        <Box sx={{ mb: 2 }}>
+                            <h2 component={'span'} style={{ marginBottom: 5 }}>Sign In to TSD </h2>
+                            <small style={{ marginTop: 0, marginBottom: 30 }}>Please login with your Username and Password</small>
+                        </Box>
                         {errors?.message}
-                        <Form method='post' >
+                        <Form method='POST' >
                             <Box>
                                 <Box>Email </Box>
                                 <input type={'text'} name="email" className='form-control' />
