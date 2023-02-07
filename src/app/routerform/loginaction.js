@@ -20,6 +20,7 @@ const login = async ({ request, params }) => {
                 status : error.response?.status,
                 message : error?.response?.data?.message
               }
+              return redirect('/')
               return obj
             }
           }

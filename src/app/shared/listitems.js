@@ -14,6 +14,10 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { NavLink } from 'react-router-dom';
+import RouteIcon from '@mui/icons-material/Route';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
 
 export const mainListItems = (
@@ -62,35 +66,35 @@ export const mainListItems = (
     
     <ListItemButton>
       <ListItemIcon>
-        <LayersIcon />
+        <RouteIcon />
       </ListItemIcon>
       <ListItemText primary="Route Planing" />
     </ListItemButton>
     
     <ListItemButton>
       <ListItemIcon>
-        <LayersIcon />
+        <SettingsSuggestIcon />
       </ListItemIcon>
       <ListItemText primary="Integration" />
     </ListItemButton>
     
     <ListItemButton>
       <ListItemIcon>
-        <LayersIcon />
+        <AccountBalanceWalletIcon />
       </ListItemIcon>
       <ListItemText primary="Expenses" />
     </ListItemButton>
     
     <ListItemButton>
       <ListItemIcon>
-        <LayersIcon />
+        <AssignmentIndIcon />
       </ListItemIcon>
       <ListItemText primary="Designation" />
     </ListItemButton>
     
     <ListItemButton>
       <ListItemIcon>
-        <LayersIcon />
+        <LocalShippingIcon />
       </ListItemIcon>
       <ListItemText primary="Vehicle Type" />
     </ListItemButton>

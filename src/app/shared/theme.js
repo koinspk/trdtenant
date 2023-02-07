@@ -68,18 +68,19 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
+
 const mdTheme = createTheme({
   typography: {
     fontFamily: 'Poppins, serif'
   },
   palette: {
     primary: {
-      light: '#0066ff',
-      main: '#ee5e65',
+      light: '#ffffff',
+      main: '#25476A',
     },
     secondary: {
       light: '#ffffff',
-      main: '#011e3c'
+      main: '#FA9F1B'
     }
   },
 });
@@ -104,7 +105,7 @@ function DashboardContent() {
     <ThemeProvider theme={mdTheme} >
       <Box sx={{ display: 'flex' }} className="header_wrap">
         <CssBaseline />
-        <AppBar position="absolute" open={open} style={{ background: '#ffffff', color: '#000000' }}>
+        <AppBar position="absolute" open={open}  style={{ background: '#25476A', color: '#ffffff' }}>
           <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
@@ -175,8 +176,8 @@ function DashboardContent() {
 
         <Drawer variant="permanent" open={open} PaperProps={{
           sx: {
-            backgroundColor: "#001e3c",
-            color: "#ffffff",
+            backgroundColor: "#ffffff",
+            color: "#001e3c",
           }
         }}>
           <Toolbar
@@ -186,9 +187,9 @@ function DashboardContent() {
               px: [1],
             }}
           >
-            <img src={require('../../assets/truck_logo_light.png')} className='logo' style={{ height: 73 }} />
+            <img src={require('../../assets/truck_logo_dark.png')} className='logo' style={{ height: 73, marginBottom: 20 }} />
           </Toolbar>
-          <Divider />
+          {/* <Divider /> */}
           <List component="nav" className='navigation_menu'>
             {mainListItems}
 
@@ -206,9 +207,10 @@ function DashboardContent() {
             height: '100vh',
             overflow: 'auto',
           }}
-        >
+        >        
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style={{ position : 'absolute', zIndex : 0 }}><path fill="#25476A" fill-opacity="1" d="M0,128L60,128C120,128,240,128,360,128C480,128,600,128,720,144C840,160,960,192,1080,213.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4, zIndex: 1, position : 'relative' }}>
             <Outlet />
           </Container>
         </Box>

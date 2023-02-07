@@ -39,8 +39,8 @@ export const data = {
     {
       label: 'Dataset 1',
       data: [10, 30, 20, 60, 5, 7, 2],
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      borderColor: 'rgb(236 166 65)',
+      backgroundColor: 'rgb(236 166 65)',
     },
   ],
 };
