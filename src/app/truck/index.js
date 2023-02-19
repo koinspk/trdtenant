@@ -1,81 +1,95 @@
-import React from 'react';
-import { Button, Grid, Box, Modal, Backdrop } from '@mui/material';
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react'
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { DataGrid } from '@mui/x-data-grid';
+import { Button, Grid, Modal, Backdrop, Box, Alert, Table, TableBody, TableContainer, TablePagination, Chip, Pagination } from '@mui/material'
+import { Form, useActionData, useRouteLoaderData } from 'react-router-dom';
+import { Services } from '../service/services';
+import TablePaginationFeild from '../components/tablePagination';
+import { Menu, MenuItem, Checkbox, TableRow, TableCell, TableHead, TableSortLabe, TablePaginationl, Snackbar, IconButton } from '@mui/material';
+import UserListToolbar from '../components/user/userList';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreActionMenu from '../components/moreAction';
+import PasswordInput from '../components/password';
+import NoData from '../components/noData';
 
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 1000,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    pt: 2,
-    px: 4,
-    pb: 3,
-};
-const columns = [
-    { field: 'id', headerName: 'ID', width : 15, },
-    { field: 'tname', headerName: 'Truck Name', width: 140 },
-    { field: 'tno', headerName: 'Truck No', width: 130 },
-    { field: 'vtype', headerName: 'Vehicle Type', width: 130 },
-    {
-        field: 'insurancedate',
-        headerName: 'Insurance Expire',
-        width: 140,
-    },
-    {
-        field: 'driver',
-        headerName: 'Default Driver',
-        width: 160,
-    },
-    {
-        field: 'vno',
-        headerName: 'Vehicle No',
-        width: 160,
-    },
-    {
-        field: 'ownedby',
-        headerName: 'Owned By',
-        width: 160,
-    },
-    {
-        field: 'action',
-        headerName: 'Action',
-        sortable: false,
-        width: 160,
-        type : 'boolean',
-        editable : true,
-        renderCell:params=><><Button sx={{ mr: 1 }} color='secondary' variant='outlined'>Edit</Button><Button color='secondary' variant='outlined'>Delete</Button> </>
-    },
-];
-
-const rows = [
-    { id: 1, tname: 'Truck A', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/1999', insurancedate: 'Driver A', vno: 'TN 15 2199', ownedby: 'Owned AA', },
-    { id: 2, tname: 'Truck B', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/1999', insurancedate: 'Driver B', vno: 'TN 17 2023', ownedby: 'Owned AA', },
-    { id: 3, tname: 'Truck C', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/1999', insurancedate: 'Driver C', vno: 'TN 18 4345', ownedby: 'Owned AA', },
-    { id: 4, tname: 'Truck D', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/2001', insurancedate: 'Driver D', vno: 'TN 20 2199', ownedby: 'Owned AA', },
-    { id: 5, tname: 'Truck E', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/1999', insurancedate: 'Driver E', vno: 'TN 11 3232', ownedby: 'Owned AA', },
-    { id: 6, tname: 'Truck F', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/2004', insurancedate: 'Driver F', vno: 'TN 05 2323', ownedby: 'Owned AA', },
-    { id: 7, tname: 'Truck G', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/2007', insurancedate: 'Driver G', vno: 'TN 07 3232', ownedby: 'Owned AA', },
-    { id: 8, tname: 'Truck A', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/2006', insurancedate: 'Driver A', vno: 'TN 09 2323', ownedby: 'Owned AA', },
-    { id: 3, tname: 'Truck C', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/1999', insurancedate: 'Driver C', vno: 'TN 18 4345', ownedby: 'Owned AA', },
-    { id: 4, tname: 'Truck D', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/2001', insurancedate: 'Driver D', vno: 'TN 20 2199', ownedby: 'Owned AA', },
-    { id: 5, tname: 'Truck E', tno: 'TT4343', vtype: 'Two Wheeler', insurancedate: '20/12/1999', insurancedate: 'Driver E', vno: 'TN 11 3232', ownedby: 'Owned AA', },
-
-];
 
 function Index() {
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
     const navigate = useNavigate();
+    const actiondata = useActionData();
+    const loaderData = useRouteLoaderData('user');
+
+    const [companyForm, setCompanyForm] = useState(false);
+    const [ListData, setListData] = useState([]);
+    const [filterName, setFilterName] = useState('');
+    const [snackOpen, setSnackOpen] = useState(false);
+    const [companyList, setCompanyList] = useState(false);
+
+
+    const [pagination, setPagination] = useState({
+        rowsPerPage: 10,
+        page: 0,
+        count: 1,
+    });
+
+    const handleSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackOpen(false);
+    };
+    const handleChangeForm = () => {
+        setCompanyForm(!companyForm);
+    };
+    useEffect(() => {
+        actiondata?.status && handleChangeForm(false)
+    }, [actiondata])
+
+    useEffect(() => {
+        getListData();
+    }, [pagination?.page, pagination?.rowsPerPage])
+
+    useEffect(() => {
+        getComapnyList();
+    }, []);
+
+    const getComapnyList = async () => {
+        let cdata = await Services.companyList({
+            page: 1,
+            pageSize: 10
+        });
+        console.log(cdata);
+        setCompanyList(cdata?.data?.items)
+    }
+
+    const getListData = async () => {
+        let listData = await Services.userList({
+            page: pagination?.page,
+            pageSize: pagination?.rowsPerPage
+        });
+        setListData(listData?.data?.items)
+        setPagination({
+            ...pagination,
+            count: listData?.data?.total,
+        })
+    }
+    const handleFilterByName = (filterName) => {
+        setFilterName(filterName);
+    };
+
+    const changeEvent = (page) => {
+        setPagination({
+            ...pagination,
+            page: page
+        })
+    }
+    const handleChangeRowsPerPage = (event) => {
+        setPagination({
+            ...pagination,
+            rowsPerPage: parseInt(event.target.value, 10),
+            page: 0
+        })
+    };
 
     return (
         <div className='mainwrapper'>
@@ -84,24 +98,65 @@ function Index() {
                     Truck List
                 </Grid>
                 <Grid item md={6} style={{ textAlign: 'right ' }}>
-                    <Button onClick={handleOpen} variant="outlined" className='add_btn'>Add Truck</Button>
+                    <Button onClick={handleChangeForm} variant="outlined" className='add_btn'>Add Truck</Button>
                 </Grid>
             </Grid>
 
-            <Box style={{ height: 400, width: '100%' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
+
+
+            <TableContainer>
+                <Table>
+                    <TableHead sx={{
+                        backgroundColor: '#F4F6F8', borderRadius: 5,
+                        borderBottom: `solid 1px #ccc`,
+                        '& th': { backgroundColor: 'transparent' },
+                    }}>
+                        <TableCell sx={{ width: 50 }}> Sno </TableCell>
+                        <TableCell>Truck Name </TableCell>
+                        <TableCell>Truck No </TableCell>
+                        <TableCell>Vehicle Tyoe </TableCell>
+                        <TableCell>Driver</TableCell>
+                        <TableCell> Owned By </TableCell>
+                    </TableHead>
+
+                    <TableBody>
+                        {ListData.length > 0 && ListData.map((list, i) => (
+                            <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
+                                <TableCell>{i + 1}</TableCell>
+                                <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.first_name ?? '--'}</TableCell>
+                                <TableCell>{list?.mobile_number ?? '00000 00000'}</TableCell>
+                                <TableCell>{list?.email ?? '--'}</TableCell>
+                                <TableCell sx={{ alignItems: 'center', display: 'flex' }}> {list?.empno}</TableCell>
+                                <TableCell sx={{ width: 60 }}>
+                                    <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {ListData.length <= 0 && (
+                <NoData />
+            )}
+
+            {ListData.length > 0 &&
+                < TablePaginationFeild
+                    rowsPerPageOptions={[10, 20]}
+                    count={pagination.count}
+                    rowsPerPage={pagination.rowsPerPage}
+                    pageSize={pagination.pageSize}
+                    page={pagination.page}
+                    changeEvent={changeEvent}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </Box>
+            }
 
             <Box>
                 {/* <Button >Open Child Modal</Button> */}
                 <Modal
-                    open={open}
-                    onClose={handleClose}
+                    open={companyForm}
+                    // onClose={handleChangeForm}
                     aria-labelledby="child-modal-title"
                     BackdropComponent={Backdrop}
                     aria-describedby="child-modal-description"
@@ -124,7 +179,7 @@ function Index() {
                             <input type={'text'} placeholder="Max Speed" className='form-control' />
                         </Box>
                         <Box className='modalaction'>
-                            <Button onClick={handleClose} className='btn cancel_btn'>Cancel</Button>
+                            <Button onClick={handleChangeForm} className='btn cancel_btn'>Cancel</Button>
                             <Button className='btn submit_btn'>Submit</Button>
                         </Box>
                     </Box>

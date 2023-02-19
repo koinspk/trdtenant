@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useRouteLoaderData } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Grid, Modal, Backdrop, Box, Alert, Table, TableBody, TableContainer, TablePagination, Chip, Pagination } from '@mui/material'
 import { Form, useActionData } from 'react-router-dom';
 import { Services } from '../../service/services';
@@ -14,12 +14,10 @@ import NoData from '../../components/noData';
 
 
 function Index() {
-
     const navigate = useNavigate();
     const actiondata = useActionData();
-    const loaderData = useRouteLoaderData('role');
 
-    const [modalForm, setModalForm] = useState(false);
+    const [companyForm, setCompanyForm] = useState(false);
     const [listData, setListData] = useState([]);
     const [filterName, setFilterName] = useState('');
     const [snackOpen, setSnackOpen] = useState(false);
@@ -43,7 +41,7 @@ function Index() {
         setActionMenu(!actionMenu);
     };
     const handleChangeForm = () => {
-        setModalForm(!modalForm);
+        setCompanyForm(!companyForm);
     };
     useEffect(() => {
         actiondata?.status && handleChangeForm(false)
@@ -54,12 +52,11 @@ function Index() {
     }, [pagination?.page, pagination?.rowsPerPage])
 
     const getCompany = async () => {
-        let listData = await Services.rolesList({
-            page: pagination?.page + 1,
+        let listData = await Services.designationList({
+            page: pagination?.page,
             pageSize: pagination?.rowsPerPage
         });
         setListData(listData?.data?.items)
-        console.log(listData);
         setPagination({
             ...pagination,
             count: listData?.data?.total,
@@ -90,13 +87,10 @@ function Index() {
         <div className='mainwrapper'>
             <Grid container sx={{ mb: 3 }} alignItems="center">
                 <Grid item md={6}>
-                    <Box className="title_page">Roles List</Box>
+                    <Box className="title_page">Designation List</Box>
                 </Grid>
                 <Grid item md={6} style={{ textAlign: 'right ' }}>
-                    <Button onClick={() => {
-                        navigate('/setings/roles')
-                        handleChangeForm();
-                    }} variant="outlined" className='add_btn'>Add Role</Button>
+                    <Button onClick={handleChangeForm} variant="outlined" className='add_btn'>Add Designation</Button>
                 </Grid>
             </Grid>
 
@@ -110,24 +104,20 @@ function Index() {
                     key={"top" + "right"}
                 >
                     <Alert severity="success" sx={{ width: '100%' }}>
-                        Role has beeen Created
+                        Designation has beeen Created
                     </Alert>
                 </Snackbar>
                 {/* <UserListToolbar
-                    filterName={filterName}
-                    onFilterName={handleFilterByName}
-                // onDeleteUsers={() => handleDeleteMultiUser(selected)}
-                /> */}
+        filterName={filterName}
+        onFilterName={handleFilterByName}
+    // onDeleteUsers={() => handleDeleteMultiUser(selected)}
+    /> */}
 
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{
-                            backgroundColor: '#F4F6F8', borderRadius: 5,
-                            borderBottom: `solid 1px #ccc`,
-                            '& th': { backgroundColor: 'transparent' },
-                        }}>
+                        <TableHead sx={{ backgroundColor: '#F4F6F8', borderRadius: 5 }}>
                             <TableCell sx={{ width: 50 }}> Sno </TableCell>
-                            <TableCell> Name </TableCell>
+                            <TableCell> Designation </TableCell>
                             <TableCell> Description</TableCell>
                             <TableCell> Create At </TableCell>
                             <TableCell>  </TableCell>
@@ -137,7 +127,7 @@ function Index() {
                             {listData.length > 0 && listData.map((list, i) => (
                                 <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
                                     <TableCell>{i + 1}</TableCell>
-                                    <TableCell sx={{ alignItems: 'center', display: 'flex', textTransform: 'capitalize' }}>{list?.name ?? '--'}</TableCell>
+                                    <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.designation ?? '--'}</TableCell>
                                     <TableCell>{list?.description ?? '00000 00000'}</TableCell>
                                     <TableCell>{moment(list?.createdAt).format("DD MMM yyyy") ?? '--'}</TableCell>
                                     <TableCell sx={{ width: 60 }}>
@@ -153,7 +143,7 @@ function Index() {
                     <NoData />
                 )}
 
-                {listData.length > 0 &&
+                {listData.length > 0 && (
                     <TablePaginationFeild
                         rowsPerPageOptions={[5, 10, 20]}
                         count={pagination.count}
@@ -163,13 +153,13 @@ function Index() {
                         changeEvent={changeEvent}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
-                }
+                )}
             </Box>
 
             <Box>
                 <Modal
-                    open={modalForm}
-                    onClose={handleChangeForm}
+                    open={companyForm}
+                    // onClose={handleChangeForm}
                     aria-labelledby="child-modal-title"
                     aria-describedby="child-modal-description"
                 >
@@ -177,9 +167,8 @@ function Index() {
                         <h2>New Role</h2>
                         <Form method='post'>
                             <Box style={{ height: 300, overflow: 'scroll' }}>
-                                <input type={'text'} value={loaderData?.name} name="name" placeholder="Name" className='form-control' />
-                                <input type={'text'} value={loaderData?.slug} name="slug" placeholder="Slug" className='form-control' />
-                                <input type={'text'} value={loaderData?.description} name="description" placeholder="Description" className='form-control' />
+                                <input type={'text'} name="designation" placeholder="Designation" className='form-control' />
+                                <input type={'text'} name="description" placeholder="Description" className='form-control' />
                             </Box>
                             <Box className='modalaction'>
                                 <Button onClick={handleChangeForm} className='btn cancel_btn'>Cancel</Button>

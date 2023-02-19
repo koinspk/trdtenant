@@ -12,15 +12,21 @@ import {
 } from "react-router-dom";
 import DashboardContent from "./app/shared/theme"
 import Company from "./app/company"
+import CompanyEdit from "./app/company/edit"
 import Login from "./app/login"
 import CompanyForm from './app/company/companyForm';
 import Users from './app/users';
 import Truck from './app/truck';
 import Dashboard from './app/dashboard';
 import Roles from './app/setings/roles';
+import Designation from './app/setings/designation';
 import Delivery from './app/deliveryplaning';
 import loginActionForm from "./app/routerform/loginaction"
 import companyActionForm from "./app/routerform/companyaction"
+import userActionForm from "./app/routerform/userAction"
+import roleActionForm from "./app/routerform/roleAction"
+import designationActionForm from "./app/routerform/designationAction"
+import Profile from './app/profile'
 import axios from 'axios';
 
 
@@ -67,32 +73,54 @@ const router = createBrowserRouter(
           <Route path="" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
 
-          <Route path="/company" action={companyActionForm.createAction}>
-            <Route path="" element={<Company />} />
+          <Route path="/" >
+            <Route path='company' element={<Company />} action={companyActionForm.createAction} />
+            <Route
+              path="company/edit/:id"
+              element={<CompanyEdit />}
+              loader={companyActionForm.getCompanyId}
+              action={companyActionForm.update}
+            />
           </Route>
 
-          <Route path="/users">
-            <Route path="" element={<Users />} />
+          <Route path="/" >
+            <Route path="users" element={<Users />} action={userActionForm.createAction} />
+            <Route path=":id"
+              id="user"
+              element={<Users />}
+              loader={userActionForm.getUserId}
+            />
           </Route>
+
           <Route path="/truck">
             <Route path="" element={<Truck />} />
           </Route>
 
           <Route path="/setings">
-            <Route path="roles" element={<Roles />} />
+            <Route path="roles" element={<Roles />} action={roleActionForm.createAction} >
+              <Route path=":id"
+                id="role"
+                element={<Roles />}
+                loader={roleActionForm.getRoleId}
+              />
+            </Route>
           </Route>
 
-          <Route path="/setings">
-            <Route path="roles" element={<Roles />} />
+          <Route path="/designation" element={<Designation />} action={designationActionForm.createAction} >
+            <Route path=":id"
+              element={<Roles />}
+              loader={designationActionForm.getDesignationId}
+            />
           </Route>
 
           <Route path="/deliveryplaning">
             <Route path="" element={<Delivery />} />
           </Route>
 
+          <Route path="/profile">
+            <Route path="" element={<Profile />} />
+          </Route>
         </Route>
-
-
       </Route>
     </>
   )
@@ -105,7 +133,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 );
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));
-// root.render( 
+// root.render(
 //   <BrowserRouter>
 //       <App />
 //   </BrowserRouter>

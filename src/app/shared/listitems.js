@@ -57,6 +57,13 @@ export const mainListItems = (
       <ListItemText primary="Roles" />
     </ListItemButton>
     
+    <ListItemButton component={NavLink}  to="/designation">
+      <ListItemIcon>
+        <AssignmentIndIcon />
+      </ListItemIcon>
+      <ListItemText primary="Designation" />
+    </ListItemButton>
+    
     <ListItemButton component={NavLink}  to="/deliveryplaning">
       <ListItemIcon>
         <DescriptionIcon />
@@ -83,13 +90,6 @@ export const mainListItems = (
         <AccountBalanceWalletIcon />
       </ListItemIcon>
       <ListItemText primary="Expenses" />
-    </ListItemButton>
-    
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIndIcon />
-      </ListItemIcon>
-      <ListItemText primary="Designation" />
     </ListItemButton>
     
     <ListItemButton>

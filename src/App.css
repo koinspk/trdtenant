@@ -15,12 +15,17 @@
   padding: 1.5em;
   border-radius: 8px;
 }
+.carrdwrapper {
+  background: #ffffff;
+  padding: 1.5em;
+  border-radius: 8px;
+}
 body #root{
   font-family: 'Poppins', sans-serif;
 }
 
 .nodata_comp {
-  max-width: 500px;
+  max-width: 350px;
   width: auto;
   margin: auto;
 }
@@ -53,7 +58,22 @@ body #root{
   box-shadow: rgb(149 157 165 / 20%) 0px 8px 24px;
   box-shadow: none;
 }
-
+.profile_menu .MuiPaper-elevation{
+  box-shadow: rgb(145 158 171 / 24%) 0px 0px 2px 0px, 
+            rgb(145 158 171 / 24%) -20px 20px 40px -4px;
+  border-radius: 10px;
+  max-width: 205px;
+  width: 100%;
+}
+.profile_menu .header{
+  border-bottom: 1px dashed #d6d6d6;
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+}
+.profile_menu .header .mail{
+  font-size: 13px;
+  opacity: .7;
+}
 .company_table {
   box-shadow: none !important;
 }
@@ -83,25 +103,33 @@ body #root{
   box-shadow: 0px 0px 10px 2px #0000001a;
 }
 
-.login_btn {
+body .login_btn {
   /* background-color: var(--mainsecondary) !important; */
   background: linear-gradient(45deg, var(--gradient1), var(--gradient2));
   color: #ffffff !important;
-  height: 45px;
+  height: 46px;
   font-weight: 600;
   font-size: 16px;
+  border-radius: 8px;
+  box-shadow: rgb(45 78 111 / 20%) 0px 0px 2px 0px,
+   rgb(32 59 87 / 35%) 0px 12px 24px -4px
 }
 
 .form-control {
   width: 100%;
   border: 1px solid #ccc;
-  height: 46px;
-  border-radius: 3px;
+  height: 50px;
+  border-radius: 8px;
   margin-bottom: 15px;
   margin-top: 3px;
   padding: 10px;
   box-sizing: border-box;
 }
+.form-control:focus-visible {
+  outline: 0;
+  border-color: #426588 !important;
+}
+
 body .MuiFormControl-root{
   margin-bottom: 15px;
 }
@@ -109,7 +137,7 @@ body .MuiFormControl-root{
 .login_left {
   /* background-color: var(--gradient1); */
   background: linear-gradient(66deg, #193a5b, #7da2c9);
-  min-height: 70vh;
+  min-height: 71vh;
   display: flex;
   align-items: center;
 }
@@ -178,6 +206,9 @@ body button.MuiButton-root {
   padding: 20px;
   background-color: #fff;
   border-radius: 6px;
+}
+.modal_title{
+  margin-top: 0;
 }
 
 
@@ -305,4 +336,23 @@ body button.MuiButton-root {
 }
 .orderscount_box p, .orderscount_box .MuiChip-filled{
   font-size: 10px;
+}
+
+.title_page {
+  font-size: 1.1em;
+}
+
+.passwordFld{
+  display: flex;
+  margin-bottom: 15px;
+  position: relative;
+}
+.passwordFld .form-control{
+  margin: 0;
+}
+.passwordFld .password_icon{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 3px;
 }

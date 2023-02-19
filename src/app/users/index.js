@@ -1,41 +1,36 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, Grid, Modal, Backdrop, Box, Alert, Table, TableBody, TableContainer, TablePagination, Chip, Pagination } from '@mui/material'
-import { Form, useActionData } from 'react-router-dom';
+import { Form, useActionData, useRouteLoaderData } from 'react-router-dom';
 import { Services } from '../service/services';
 import TablePaginationFeild from '../components/tablePagination';
-import { Menu,MenuItem,Checkbox, TableRow, TableCell, TableHead, TableSortLabe, TablePaginationl, Snackbar, IconButton } from '@mui/material';
+import { Menu, MenuItem, Checkbox, TableRow, TableCell, TableHead, TableSortLabe, TablePaginationl, Snackbar, IconButton } from '@mui/material';
 import UserListToolbar from '../components/user/userList';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreActionMenu from '../components/moreAction';
+import PasswordInput from '../components/password';
+import NoData from '../components/noData';
 
 
 function Index() {
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
     const navigate = useNavigate();
-
-
-    // const actiondata = useActionData();
+    const actiondata = useActionData();
+    const loaderData = useRouteLoaderData('user');
 
     const [companyForm, setCompanyForm] = useState(false);
-    const [companyList, setCompanyList] = useState([]);
+    const [ListData, setListData] = useState([]);
     const [filterName, setFilterName] = useState('');
     const [snackOpen, setSnackOpen] = useState(false);
-    const [actionMenu, setActionMenu] = useState(false);
+    const [companyList, setCompanyList] = useState(false);
+
 
     const [pagination, setPagination] = useState({
-        rowsPerPage: 5,
-        page: 1,
+        rowsPerPage: 10,
+        page: 0,
         count: 1,
     });
-
 
     const handleSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
@@ -43,34 +38,38 @@ function Index() {
         }
         setSnackOpen(false);
     };
-
-    const changeActionMenu = () => {
-        setActionMenu(!actionMenu);
-    };
     const handleChangeForm = () => {
         setCompanyForm(!companyForm);
     };
-    // useEffect(() => {
-    //     console.log(actiondata);
-    //     if (actiondata?.status == 201) {
-    //         handleChangeForm(false);
-    //     }
-    // }, [actiondata])
+    useEffect(() => {
+        actiondata?.status && handleChangeForm(false)
+    }, [actiondata])
 
     useEffect(() => {
-        getCompany();
-    }, [pagination?.pageSize])
-    const getCompany = async () => {
-        let listData = await Services.companyList({
+        getListData();
+    }, [pagination?.page, pagination?.rowsPerPage])
+
+    useEffect(() => {
+        getComapnyList();
+    }, []);
+
+    const getComapnyList = async () => {
+        let cdata = await Services.companyList({
+            page: 1,
+            pageSize: 10
+        });
+        console.log(cdata);
+        setCompanyList(cdata?.data?.items)
+    }
+
+    const getListData = async () => {
+        let listData = await Services.userList({
             page: pagination?.page,
             pageSize: pagination?.rowsPerPage
         });
-        setCompanyList(listData?.data?.items)
-        console.log(listData);
+        setListData(listData?.data?.items)
         setPagination({
             ...pagination,
-            page: listData?.data?.page,
-            rowsPerPage: listData?.data?.pageSize,
             count: listData?.data?.total,
         })
     }
@@ -92,20 +91,26 @@ function Index() {
         })
     };
 
+    const handleDeleteUser = () => {
+
+    }
     return (
         <div className='mainwrapper'>
-            <Grid container sx={{ mb: 3 }}>
+            <Grid container sx={{ mb: 3 }} alignItems="center">
                 <Grid item md={6}>
-                    Users List
+                    <Box className="title_page">Users List</Box>
                 </Grid>
                 <Grid item md={6} style={{ textAlign: 'right ' }}>
-                    <Button variant="outlined" onClick={handleOpen} className='add_btn'>Add User</Button>
+                    <Button variant="outlined" onClick={() => {
+                        navigate('/users')
+                        handleChangeForm();
+                    }} className='add_btn'>Add User</Button>
                 </Grid>
             </Grid>
 
             <Box className="">
-                {/* <Snackbar
-                    open={actiondata?.status == 201}
+                <Snackbar
+                    open={actiondata?.status}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     autoHideDuration={3000}
                     onClose={handleSnackbar}
@@ -113,41 +118,41 @@ function Index() {
                     key={"top" + "right"}
                 >
                     <Alert severity="success" sx={{ width: '100%' }}>
-                        This is a success message!
+                        User has beeen Created
                     </Alert>
-                </Snackbar> */}
-                <UserListToolbar
+                </Snackbar>
+
+                {/* <UserListToolbar
                     filterName={filterName}
                     onFilterName={handleFilterByName}
                 // onDeleteUsers={() => handleDeleteMultiUser(selected)}
-                />
+                /> */}
 
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ backgroundColor: '#F4F6F8', borderRadius: 5 }}>
+                        <TableHead sx={{
+                            backgroundColor: '#F4F6F8', borderRadius: 5,
+                            borderBottom: `solid 1px #ccc`,
+                            '& th': { backgroundColor: 'transparent' },
+                        }}>
                             <TableCell sx={{ width: 50 }}> Sno </TableCell>
                             <TableCell> Name </TableCell>
-                            <TableCell> Employee No </TableCell>
-                            <TableCell> Designation </TableCell>
-                            <TableCell> Email </TableCell>
                             <TableCell> Contact No </TableCell>
-                            <TableCell> Company </TableCell>
-                            <TableCell> Role </TableCell>
+                            <TableCell> Email </TableCell>
+                            <TableCell>  Employee No </TableCell>
                             <TableCell>  </TableCell>
                         </TableHead>
 
                         <TableBody>
-                            {companyList && companyList.slice(pagination.page * pagination.rowsPerPage, pagination.page * pagination.rowsPerPage + pagination.rowsPerPage).map((list, i) => (
-                                <TableRow>
+                            {ListData.length > 0 && ListData.map((list, i) => (
+                                <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
                                     <TableCell>{i + 1}</TableCell>
-                                    <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.subsidiarycompany}</TableCell>
-                                    <TableCell>{list?.contactno}</TableCell>
-                                    <TableCell>{list?.emailid}</TableCell>
-                                    <TableCell sx={{ alignItems: 'center', display: 'flex' }}> <PlaceOutlinedIcon sx={{ opacity: .3 }} />{list?.street}, {list?.street}</TableCell>
-                                    <TableCell>
-                                        <Chip label={list?.status} size="small" variant="outlined" color="error" />
-                                    </TableCell>
-                                    <TableCell>
+                                    <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.first_name ?? '--'}</TableCell>
+                                    <TableCell>{list?.mobile_number ?? '00000 00000'}</TableCell>
+                                    <TableCell>{list?.email ?? '--'}</TableCell>
+                                    <TableCell sx={{ alignItems: 'center', display: 'flex' }}> {list?.empno}</TableCell>
+                                    <TableCell sx={{ width: 60 }}>
+                                        <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -155,24 +160,27 @@ function Index() {
                     </Table>
                 </TableContainer>
 
-                <TablePaginationFeild
-                    rowsPerPageOptions={[10, 20]}
-                    count={pagination.count}
-                    rowsPerPage={pagination.rowsPerPage}
-                    pageSize={pagination.pageSize}
-                    page={pagination.page}
-                    changeEvent={changeEvent}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
+                {ListData.length <= 0 && (
+                    <NoData />
+                )}
+
+                {ListData.length > 0 &&
+                    < TablePaginationFeild
+                        rowsPerPageOptions={[10, 20]}
+                        count={pagination.count}
+                        rowsPerPage={pagination.rowsPerPage}
+                        pageSize={pagination.pageSize}
+                        page={pagination.page}
+                        changeEvent={changeEvent}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                }
             </Box>
 
-
-
             <Box>
-                {/* <Button >Open Child Modal</Button> */}
                 <Modal
-                    open={open}
-                    onClose={handleClose}
+                    open={companyForm}
+                    onClose={handleChangeForm}
                     aria-labelledby="child-modal-title"
                     BackdropComponent={Backdrop}
                     aria-describedby="child-modal-description"
@@ -181,17 +189,23 @@ function Index() {
                         <h2>Add User</h2>
                         <Form method='post'>
                             <Box style={{ height: 300, overflow: 'scroll' }}>
-                                <input type={'text'} placeholder="First Name" name='firstname' className='form-control' />
-                                <input type={'text'} placeholder="Last Name" name='lastname' className='form-control' />
+                                <input type={'text'} placeholder="First Name" name='first_name' className='form-control' />
+                                <input type={'text'} placeholder="Last Name" name='last_name' className='form-control' />
                                 <input type={'email'} placeholder="Email" name='email' className='form-control' />
-                                <input type={'text'} placeholder="Employee No" name='employeno' className='form-control' />
+                                <input type={'text'} placeholder="Mobile No" name='mobile_number' className='form-control' />
+                                <input type={'text'} placeholder="Employee No" name='empno' className='form-control' />
                                 <input type={'text'} placeholder="Designation" name='designation' className='form-control' />
-                                <input type={'text'} placeholder="Company" name='company' className='form-control' />
+                                <select placeholder="Company" name='company' className='form-control' >
+                                    <option value="" selected disabled hidden>Select Company</option>
+                                    {companyList.length > 0 && companyList.map((optionList, i) => (
+                                        <option value={optionList?._id} >{optionList?.subsidiarycompany}</option>
+                                    ))}
+                                </select>
                                 <input type={'text'} placeholder="Role" name='role' className='form-control' />
-                                <input type={'text'} placeholder="Password" name='password' className='form-control' />
+                                <PasswordInput value={loaderData?.password} placeholder="Password" name='password' className='form-control' />
                             </Box>
                             <Box className='modalaction'>
-                                <Button onClick={handleClose} className='btn cancel_btn'>Cancel</Button>
+                                <Button onClick={handleChangeForm} className='btn cancel_btn'>Cancel</Button>
                                 <Button className='btn submit_btn' type='submit'>Submit</Button>
                             </Box>
                         </Form>

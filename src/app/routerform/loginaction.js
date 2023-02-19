@@ -4,34 +4,34 @@ import { loginService } from "../service/loginService"
 
 const login = async ({ request, params }) => {
 
-        switch (request.method) {
-          case "POST": {
-            let formData = await request.formData(); 
-            try {
-               let data = await loginService.login(formData)
-               let resdata = data?.data?.message || []
-              localStorage.setItem("tsdtenant",JSON.stringify(resdata))
-              localStorage.setItem("tsdrftoken",resdata.refreshToken)
+  switch (request.method) {
+    case "POST": {
+      let formData = await request.formData();
+      var object = {};
+      formData.forEach((value, key) => object[key] = value);
+      try {
+        let data = await loginService.login(object)
+        let resdata = data?.data?.message || []
+        localStorage.setItem("tsdtenant", JSON.stringify(resdata))
+        localStorage.setItem("tsdrftoken", resdata.refreshToken)
 
-               return redirect('/')
-            } catch (error) {
-              console.log(error);
-              let obj = {
-                status : error.response?.status,
-                message : error?.response?.data?.message
-              }
-              return redirect('/')
-              return obj
-            }
-          }
-          default: {
-            throw new Response("", { status: 405 });
-          }
+        return redirect('/')
+      } catch (error) {
+        let obj = {
+          status: error.response?.status,
+          message: error?.response?.data?.message
         }
+        return obj
+      }
+    }
+    default: {
+      throw new Response("", { status: 405 });
+    }
+  }
 }
 
 const loginActionForm = {
-  loginAction : login
+  loginAction: login
 }
 
 export default loginActionForm

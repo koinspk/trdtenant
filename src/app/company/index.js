@@ -1,31 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import ExpandableRowTable from './gridTable';
 import { Button, Grid, Modal, Backdrop, Box, Alert, Table, TableBody, TableContainer, TablePagination, Chip, Pagination } from '@mui/material'
-import { Form, useActionData } from 'react-router-dom';
+import { Form, useActionData, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import { Services } from '../service/services';
-import { Menu,MenuItem,Checkbox, TableRow, TableCell, TableHead, TableSortLabe, TablePaginationl, Snackbar, IconButton } from '@mui/material';
+import { Menu, MenuItem, Checkbox, TableRow, TableCell, TableHead, TableSortLabe, TablePaginationl, Snackbar, IconButton } from '@mui/material';
 import Scrollbar from '../components/scrollbar';
 import UserListToolbar from '../components/user/userList';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TablePaginationFeild from '../components/tablePagination';
+import MoreActionMenu from '../components/moreAction';
+import NoData from '../components/noData';
 
 
 
 export default function Index() {
 
   const actiondata = useActionData();
+  const loaderData = useRouteLoaderData('root');
+  const navigate = useNavigate();
 
   const [companyForm, setCompanyForm] = useState(false);
   const [companyList, setCompanyList] = useState([]);
   const [filterName, setFilterName] = useState('');
   const [snackOpen, setSnackOpen] = useState(false);
-  const [actionMenu, setActionMenu] = useState(false);
 
   const [pagination, setPagination] = useState({
     rowsPerPage: 5,
-    page: 1,
-    count : 1,
+    page: 0,
+    count: 1,
   });
 
 
@@ -36,35 +39,32 @@ export default function Index() {
     setSnackOpen(false);
   };
 
-  const changeActionMenu = () => {
-    setActionMenu(!actionMenu);
-  };
   const handleChangeForm = () => {
     setCompanyForm(!companyForm);
   };
   useEffect(() => {
-    console.log(actiondata);
-    if (actiondata?.status == 201) {
-      handleChangeForm(false);
-    }
+    actiondata?.status && handleChangeForm()
   }, [actiondata])
+
+  // useEffect(() => {
+  //   handleChangeForm()
+  // }, [loaderData?._id])
 
   useEffect(() => {
     getCompany();
-  }, [pagination?.page])
+  }, [pagination?.page, pagination?.rowsPerPage])
 
 
   const getCompany = async () => {
     let listData = await Services.companyList({
-      page: pagination?.page,
+      page: pagination?.page + 1,
       pageSize: pagination?.rowsPerPage
     });
     setCompanyList(listData?.data?.items)
     console.log(listData);
     setPagination({
       ...pagination,
-      rowsPerPage : listData?.data?.pageSize,
-      count : listData?.data?.total,
+      count: listData?.data?.total,
     })
   }
   const handleFilterByName = (filterName) => {
@@ -86,23 +86,38 @@ export default function Index() {
   };
 
 
+
   return (
     <div className='mainwrapper'>
-      <Grid container >
+      <Grid container sx={{ mb: 3 }} alignItems="center">
         <Grid item md={6}>
-          Company List
+          <Box className="title_page">Companies List</Box>
         </Grid>
         <Grid item md={6} style={{ textAlign: 'right ' }}>
-          <Button onClick={handleChangeForm} variant="outlined" className='add_btn'>Add Company</Button>
+          <Button onClick={() => {
+            navigate('/company')
+            handleChangeForm();
+          }} variant="outlined" className='add_btn'>Add Company</Button>
         </Grid>
       </Grid>
 
       <Box sx={{ width: '100%' }}>
-        {/* <ExpandableRowTable /> */}
+        <Snackbar
+          open={actiondata?.status}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          autoHideDuration={3000}
+          onClose={handleSnackbar}
+          message="Subsidiary Company Created"
+          key={"top" + "right"}
+        >
+          <Alert onClose={handleSnackbar} severity="success" sx={{ width: '100%' }}>
+            Company has beeen Created
+          </Alert>
+        </Snackbar>
 
         <TableContainer>
           <Table>
-            <TableHead sx={{ backgroundColor: '#F4F6F8', borderRadius: 5 }}>
+            <TableHead sx={{ backgroundColor: '#F4F6F8', borderRadius: 5, }}>
               <TableCell sx={{ width: 50 }}> Sno </TableCell>
               <TableCell> Name </TableCell>
               <TableCell> Contact No </TableCell>
@@ -112,10 +127,10 @@ export default function Index() {
               <TableCell>  </TableCell>
             </TableHead>
 
-            <TableBody>
-              {companyList && companyList.slice(pagination.page * pagination.rowsPerPage, pagination.page * pagination.rowsPerPage + pagination.rowsPerPage).map((list, i) => (
-                <TableRow>
-                  <TableCell>{i+1 }</TableCell>
+            <TableBody   >
+              {companyList.length > 0 && companyList.map((list, i) => (
+                <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
+                  <TableCell>{i + 1}</TableCell>
                   <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.subsidiarycompany}</TableCell>
                   <TableCell>{list?.contactno}</TableCell>
                   <TableCell>{list?.emailid}</TableCell>
@@ -124,36 +139,29 @@ export default function Index() {
                     <Chip label={list?.status} size="small" variant="outlined" color="error" />
                   </TableCell>
                   <TableCell>
+                    <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        {companyList.length <= 0 && (
+          <NoData />
+        )}
 
-
-
-        {/* <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={ pagination.count }
-          rowsPerPage={pagination.rowsPerPage}
-          page={pagination.page}
-          onPageChange={(e, page) => setPagination({ ...pagination, page: page })}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
-        {pagination.rowsPerPage}
-        <TablePaginationFeild
-          rowsPerPageOptions={[5,10, 20]}
-          count={ pagination.count }
-          rowsPerPage={pagination.rowsPerPage}
-          page={pagination.page}
-          changeEvent={changeEvent}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {companyList.length > 0 &&
+          <TablePaginationFeild
+            rowsPerPageOptions={[5, 10, 20]}
+            count={pagination.count}
+            rowsPerPage={pagination.rowsPerPage}
+            page={pagination.page}
+            changeEvent={changeEvent}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        }
 
         <Box>
-          {/* <Button >Open Child Modal</Button> */}
           <Modal
             open={companyForm}
             onClose={handleChangeForm}
@@ -165,7 +173,6 @@ export default function Index() {
               <h2>Add Company</h2>
               <Form method='post' enctype="multipart/form-data">
                 <Box style={{ height: 300, overflow: 'scroll' }}>
-
                   <input type={'text'} placeholder="Company Name" name='subsidiarycompany' className='form-control' />
                   <input type={'text'} placeholder="Contact No" name="contactno" className='form-control' />
                   <input type={'text'} placeholder="Email ID" name="emailid" className='form-control' />
@@ -179,16 +186,12 @@ export default function Index() {
                 <Box className='modalaction'>
                   <Button onClick={handleChangeForm} className='btn cancel_btn'>Cancel</Button>
                   <Button className='btn submit_btn' type="submit">Submit</Button>
-
                 </Box>
               </Form>
             </Box>
           </Modal>
         </Box>
       </Box>
-      {/* <div className='nodata_comp'>
-        <img src={require('../../assets/nodata.png')} />
-      </div> */}
     </div>
   )
 }

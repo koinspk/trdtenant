@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -11,14 +11,15 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Backdrop, Button, Menu, MenuItem, Modal } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { mainListItems, secondaryListItems } from './listitems';
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet, redirect, useNavigate } from "react-router-dom";
 import { NavLink } from 'react-router-dom';
+import { Services } from '../service/services';
 
 
 
@@ -85,9 +86,36 @@ const mdTheme = createTheme({
   },
 });
 
+function LogOffAlert({
+  status,
+  changeEvent,
+  onClose
+}) {
+  return (
+    <Modal
+      open={status}
+      aria-labelledby="child-modal-title"
+      aria-describedby="child-modal-description"
+    >
+      <Box className="modal_wrapper" sx={{ maxWidth: 500 }}>
+        <h2 className='modal_title'>Logout</h2>
+        <Box sx={{ pb: 2 }}>
+          Are you sure, do you want to logout ?
+        </Box>
+        <Box className='modalaction'>
+          <Button className='btn cancel_btn' onClick={onClose}>No</Button>
+          <Button className='btn submit_btn' onClick={changeEvent}>Yes</Button>
+        </Box>
+      </Box>
+    </Modal>
+  )
+}
 
 function DashboardContent() {
-  const [open, setOpen] = React.useState(true);
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(true);
+  const [curentUser, setCurentUser] = useState();
+  const [logOff, setLogOff] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -101,11 +129,27 @@ function DashboardContent() {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    localUser()
+  }, []);
+
+  const localUser = async () => {
+    let cuser = await Services.getCurentUser(setCurentUser);
+    setCurentUser(cuser)
+  }
+
+
+  const logout = () => {
+    localStorage.removeItem("tsdtenant");
+    localStorage.removeItem("tsdrftoken");
+    navigate('/login');
+  }
+
   return (
     <ThemeProvider theme={mdTheme} >
       <Box sx={{ display: 'flex' }} className="header_wrap">
         <CssBaseline />
-        <AppBar position="absolute" open={open}  style={{ background: '#25476A', color: '#ffffff' }}>
+        <AppBar position="absolute" open={open} style={{ background: '#25476A', color: '#ffffff' }}>
           <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
@@ -139,18 +183,18 @@ function DashboardContent() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Truck Sales & Distribution
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton color="inherit" 
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}>
+            <IconButton color="inherit"
+              aria-controls={open ? 'basic-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleClick}>
               <AccountCircleIcon />
             </IconButton>
 
@@ -162,14 +206,15 @@ function DashboardContent() {
               MenuListProps={{
                 'aria-labelledby': 'basic-button',
               }}
+              className="profile_menu"
             >
-              <MenuItem onClick={handleClose}>
-                <NavLink  onClick={handleClose}>Profile</NavLink>
-              </MenuItem>
+              <Box className="header" sx={{ px: 2, py: 1, }}>
+                <Box className="name">{curentUser?.username ?? 'Unknown'}</Box>
+                <Box className='mail'>{curentUser?.emailid ?? 'Unknown@gg.com'}</Box>
+              </Box>
+              <MenuItem onClick={handleClose}> Profile</MenuItem>
               {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
-              <MenuItem onClick={handleClose}>
-                <NavLink to='/login' onClick={handleClose}>Logout</NavLink>
-              </MenuItem>
+              <MenuItem onClick={() => setLogOff(true)}> Logout  </MenuItem>
             </Menu>
           </Toolbar>
         </AppBar>
@@ -207,10 +252,12 @@ function DashboardContent() {
             height: '100vh',
             overflow: 'auto',
           }}
-        >        
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style={{ position : 'absolute', zIndex : 0 }}><path fill="#25476A" fillOpacity="1" d="M0,128L60,128C120,128,240,128,360,128C480,128,600,128,720,144C840,160,960,192,1080,213.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>
+        >
+
+          <LogOffAlert onClose={() => setLogOff(false)} changeEvent={logout} status={logOff} />
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style={{ position: 'absolute', zIndex: 0 }}><path fill="#25476A" fillOpacity="1" d="M0,128L60,128C120,128,240,128,360,128C480,128,600,128,720,144C840,160,960,192,1080,213.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 5, mb: 4, zIndex: 1, position : 'relative' }}>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4, zIndex: 1, position: 'relative' }}>
             <Outlet />
           </Container>
         </Box>
