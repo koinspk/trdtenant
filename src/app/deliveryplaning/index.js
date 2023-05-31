@@ -132,7 +132,7 @@ function Index() {
     };
 
     return (
-        <> 
+        <>
             <Box>
                 <Modal
                     open={companyForm}
@@ -196,17 +196,17 @@ function Index() {
 
 
             <Box className='carrdwrapper' sx={{ mb: 3 }}>
-                <Grid container sx={{ mb: 2 }} alignItems ="center">
+                <Grid container sx={{ mb: 2 }} alignItems="center">
                     <Grid item md={6}>
                         <Box className="title_page">Delivery Planing</Box>
                     </Grid>
-                    <Grid item md={6} style={{ textAlign: 'right ', display : 'flex', alignItems : 'center',justifyContent: 'end', width : '100%' }}>
+                    <Grid item md={6} style={{ textAlign: 'right ', display: 'flex', alignItems: 'center', justifyContent: 'end', width: '100%' }}>
                         <ToggleButtonGroup className='grid_butons'
                             value={layout}
                             exclusive
                             onChange={handleAlignment}
                             aria-label="text alignment"
-                            sx={{  textAlign: 'right',  marginBottom: 0, mr: 2 }}
+                            sx={{ textAlign: 'right', marginBottom: 0, mr: 2 }}
                         >
                             <ToggleButton value="list" aria-label="left aligned">
                                 <DnsIcon />
@@ -214,61 +214,63 @@ function Index() {
                             <ToggleButton value="grid" aria-label="centered">
                                 <AutoAwesomeMosaicIcon />
                             </ToggleButton>
-                        </ToggleButtonGroup> 
+                        </ToggleButtonGroup>
                         <Button variant="outlined" onClick={handleChangeForm} className='add_btn' >Create Delivery</Button>
                     </Grid>
                 </Grid>
 
 
                 {layout == 'list' && (
-                    <TableContainer>
-                        <Table>
-                            <TableHead sx={{ backgroundColor: '#F4F6F8', borderRadius: 5, }}>
-                                <TableCell sx={{ width: 50 }}> Sno </TableCell>
-                                <TableCell> Name </TableCell>
-                                <TableCell> Contact No </TableCell>
-                                <TableCell> Email </TableCell>
-                                <TableCell> Address </TableCell>
-                                <TableCell> Status </TableCell>
-                                <TableCell>  </TableCell>
-                            </TableHead>
+                    <>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{ backgroundColor: '#F4F6F8', borderRadius: 5, }}>
+                                    <TableCell sx={{ width: 50 }}> Sno </TableCell>
+                                    <TableCell> Name </TableCell>
+                                    <TableCell> Contact No </TableCell>
+                                    <TableCell> Email </TableCell>
+                                    <TableCell> Address </TableCell>
+                                    <TableCell> Status </TableCell>
+                                    <TableCell>  </TableCell>
+                                </TableHead>
 
-                            <TableBody   >
-                                {listData.length > 0 && listData.map((list, i) => (
-                                    <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
-                                        <TableCell>{i + 1}</TableCell>
-                                        <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.subsidiarycompany}</TableCell>
-                                        <TableCell>{list?.contactno}</TableCell>
-                                        <TableCell>{list?.emailid}</TableCell>
-                                        <TableCell sx={{ alignItems: 'center', display: 'flex' }}> <PlaceOutlinedIcon sx={{ opacity: .3 }} />{list?.street}, {list?.street}</TableCell>
-                                        <TableCell>
-                                            <Chip label={list?.status} size="small" variant="outlined" color="error" />
-                                        </TableCell>
-                                        <TableCell>
-                                            <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                <TableBody   >
+                                    {listData.length > 0 && listData.map((list, i) => (
+                                        <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
+                                            <TableCell>{i + 1}</TableCell>
+                                            <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.subsidiarycompany}</TableCell>
+                                            <TableCell>{list?.contactno}</TableCell>
+                                            <TableCell>{list?.emailid}</TableCell>
+                                            <TableCell sx={{ alignItems: 'center', display: 'flex' }}> <PlaceOutlinedIcon sx={{ opacity: .3 }} />{list?.street}, {list?.street}</TableCell>
+                                            <TableCell>
+                                                <Chip label={list?.status} size="small" variant="outlined" color="error" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
 
-                        {listData.length <= 0 && (
-                            <NoData />
+                            {listData.length <= 0 && (
+                                <NoData />
+                            )}
+                        </TableContainer>
+
+
+                        {listData.length > 0 && (
+                            <TablePaginationFeild
+                                rowsPerPageOptions={[5, 10, 20]}
+                                count={pagination.count}
+                                rowsPerPage={pagination.rowsPerPage}
+                                pageSize={pagination.pageSize}
+                                page={pagination.page}
+                                changeEvent={changeEvent}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
                         )}
-                    </TableContainer>
-
-                )}
-
-                {listData.length > 0 && (
-                    <TablePaginationFeild
-                        rowsPerPageOptions={[5, 10, 20]}
-                        count={pagination.count}
-                        rowsPerPage={pagination.rowsPerPage}
-                        pageSize={pagination.pageSize}
-                        page={pagination.page}
-                        changeEvent={changeEvent}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
+                    </>
                 )}
             </Box>
 

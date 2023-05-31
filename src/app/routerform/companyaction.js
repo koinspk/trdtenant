@@ -56,14 +56,17 @@ const getCompanyId = async ({ request, params: { id } }) => {
 }
 
 const _update = async ({ request, params: { id } }) => {
+  let formData = await request.formData();
   try {
-    let data = await Services.updateCompany({ id: id });
+    let data = await Services.updateCompany(id, formData);
     let pstatus = data?.status || [];
-    console.log(data?.data);
+    console.log(data);
     let obj = {
-      data: data?.data
+      data: data?.data,
+      status : pstatus,
     }
-    return data?.data
+    // return obj
+    return redirect('/company?success=1')
 
   } catch (error) {
     console.log(error);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -11,17 +11,16 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
-import { Backdrop, Button, Menu, MenuItem, Modal } from '@mui/material';
+import { Alert, Backdrop, Button, Menu, MenuItem, Modal, Snackbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { mainListItems, secondaryListItems } from './listitems';
+import  { mainListItems,secondaryListItems } from './listitems';
 import { Navigate, Outlet, redirect, useNavigate } from "react-router-dom";
 import { NavLink } from 'react-router-dom';
 import { Services } from '../service/services';
-
-
+import SnackbarContext from '../context/snackbar';
 
 const drawerWidth = 240;
 
@@ -119,6 +118,14 @@ function DashboardContent() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const [contextValue, setContextValue] = useState({
+    open: false,
+    message: ''
+  });
+
+  const updateSnackbar = (value) => {
+    setContextValue(value)
+  }
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
@@ -133,11 +140,28 @@ function DashboardContent() {
     localUser()
   }, []);
 
+  // useEffect(() => {
+  //  setTimeout(() => {
+  //   setContextValue({
+  //     open : false,
+  //     message : ''
+  //   })
+  //  }, 4000);
+  // }, [contextValue]);
+
   const localUser = async () => {
     let cuser = await Services.getCurentUser(setCurentUser);
     setCurentUser(cuser)
   }
-
+  const snackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    updateSnackbar({
+      ...contextValue,
+      open : false,
+    });
+  };
 
   const logout = () => {
     localStorage.removeItem("tsdtenant");
@@ -147,121 +171,135 @@ function DashboardContent() {
 
   return (
     <ThemeProvider theme={mdTheme} >
-      <Box sx={{ display: 'flex' }} className="header_wrap">
-        <CssBaseline />
-        <AppBar position="absolute" open={open} style={{ background: '#25476A', color: '#ffffff' }}>
-          <Toolbar
-            sx={{
-              pr: '24px', // keep right padding when drawer closed
-            }}
-          >
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={toggleDrawer}
+      <SnackbarContext.Provider value={{ contextValue, updateSnackbar }}>
+        <Box sx={{ display: 'flex' }} className="header_wrap">
+          <CssBaseline />
+          <AppBar position="absolute" open={open} style={{ background: '#25476A', color: '#ffffff' }}>
+            <Toolbar
               sx={{
-                // marginRight: '36px',
-                ...(open && { display: 'none' }),
+                pr: '24px', // keep right padding when drawer closed
               }}
             >
-              <MenuIcon />
-            </IconButton>
-            <IconButton
-              onClick={toggleDrawer}
-              color="inherit"
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="open drawer"
+                onClick={toggleDrawer}
+                sx={{
+                  // marginRight: '36px',
+                  ...(open && { display: 'none' }),
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <IconButton
+                onClick={toggleDrawer}
+                color="inherit"
+                sx={{
+                  // marginRight: '36px',
+                  ...(!open && { display: 'none' }),
+                }}>
+                <ChevronLeftIcon />
+              </IconButton>
+              <Typography
+                component="h1"
+                variant="h6"
+                color="inherit"
+                noWrap
+                sx={{ flexGrow: 1 }}
+              >
+                Truck Sales & Distribution
+              </Typography>
+              <IconButton color="inherit">
+                <Badge badgeContent={4} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <IconButton color="inherit"
+                aria-controls={open ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={handleClick}>
+                <AccountCircleIcon />
+              </IconButton>
+
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={openMenu}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+                className="profile_menu"
+              >
+                <Box className="header" sx={{ px: 2, py: 1, }}>
+                  <Box className="name">{curentUser?.username ?? 'Unknown'}</Box>
+                  <Box className='mail'>{curentUser?.emailid ?? 'Unknown@gg.com'}</Box>
+                </Box>
+                <MenuItem onClick={handleClose}> Profile</MenuItem>
+                {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
+                <MenuItem onClick={() => setLogOff(true)}> Logout  </MenuItem>
+              </Menu>
+            </Toolbar>
+          </AppBar>
+
+          <Drawer variant="permanent" open={open} PaperProps={{
+            sx: {
+              backgroundColor: "#ffffff",
+              color: "#001e3c",
+            }
+          }}>
+            <Toolbar
               sx={{
-                // marginRight: '36px',
-                ...(!open && { display: 'none' }),
-              }}>
-              <ChevronLeftIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              Truck Sales & Distribution
-            </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton color="inherit"
-              aria-controls={open ? 'basic-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? 'true' : undefined}
-              onClick={handleClick}>
-              <AccountCircleIcon />
-            </IconButton>
-
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={openMenu}
-              onClose={handleClose}
-              MenuListProps={{
-                'aria-labelledby': 'basic-button',
+                display: 'flex',
+                alignItems: 'center',
+                px: [1],
               }}
-              className="profile_menu"
             >
-              <Box className="header" sx={{ px: 2, py: 1, }}>
-                <Box className="name">{curentUser?.username ?? 'Unknown'}</Box>
-                <Box className='mail'>{curentUser?.emailid ?? 'Unknown@gg.com'}</Box>
-              </Box>
-              <MenuItem onClick={handleClose}> Profile</MenuItem>
-              {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
-              <MenuItem onClick={() => setLogOff(true)}> Logout  </MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
+              <img src={require('../../assets/truck_logo_dark.png')} className='logo' style={{ height: 73, marginBottom: 20 }} />
+            </Toolbar>
+            {/* <Divider /> */}
+            <List component="nav" className='navigation_menu'>
+              {mainListItems}
 
-        <Drawer variant="permanent" open={open} PaperProps={{
-          sx: {
-            backgroundColor: "#ffffff",
-            color: "#001e3c",
-          }
-        }}>
-          <Toolbar
+            </List>
+          </Drawer>
+
+          <Box
+            component="main"
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              px: [1],
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light'
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              flexGrow: 1,
+              height: '100vh',
+              overflow: 'auto',
             }}
           >
-            <img src={require('../../assets/truck_logo_dark.png')} className='logo' style={{ height: 73, marginBottom: 20 }} />
-          </Toolbar>
-          {/* <Divider /> */}
-          <List component="nav" className='navigation_menu'>
-            {mainListItems}
 
-          </List>
-        </Drawer>
+            <Snackbar
+              open={contextValue.open}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              autoHideDuration={3000}
+              message={contextValue.message}
+              key={"top" + "right"}
+              onClose={snackbarClose}
+            >
+              <Alert onClose={snackbarClose} severity="success" sx={{ width: '100%' }} >{contextValue.message}</Alert>
+            </Snackbar>
 
-        <Box
-          component="main"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        >
 
-          <LogOffAlert onClose={() => setLogOff(false)} changeEvent={logout} status={logOff} />
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style={{ position: 'absolute', zIndex: 0 }}><path fill="#25476A" fillOpacity="1" d="M0,128L60,128C120,128,240,128,360,128C480,128,600,128,720,144C840,160,960,192,1080,213.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>
-          <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4, zIndex: 1, position: 'relative' }}>
-            <Outlet />
-          </Container>
+            <LogOffAlert onClose={() => setLogOff(false)} changeEvent={logout} status={logOff} />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style={{ position: 'absolute', zIndex: 0 }}><path fill="#25476A" fillOpacity="1" d="M0,128L60,128C120,128,240,128,360,128C480,128,600,128,720,144C840,160,960,192,1080,213.3C1200,235,1320,245,1380,250.7L1440,256L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>
+            <Toolbar />
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4, zIndex: 1, position: 'relative' }}>
+              <Outlet />
+            </Container>
+          </Box>
         </Box>
-      </Box>
+      </SnackbarContext.Provider>
     </ThemeProvider>
   );
 }

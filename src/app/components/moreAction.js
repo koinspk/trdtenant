@@ -8,7 +8,7 @@ import { MoreVert } from '@mui/icons-material';
 import { Popover } from '@mui/material';
  
 
-export default function MoreActionMenu({ onDelete, editRowId, openModal, changeMethod }) {
+export default function MoreActionMenu({ onDelete, editRowId, openModal  }) {
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {

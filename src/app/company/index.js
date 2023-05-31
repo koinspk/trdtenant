@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ExpandableRowTable from './gridTable';
 import { Button, Grid, Modal, Backdrop, Box, Alert, Table, TableBody, TableContainer, TablePagination, Chip, Pagination } from '@mui/material'
-import { Form, useActionData, useNavigate, useRouteLoaderData } from 'react-router-dom';
+import { Form, useActionData, useLocation, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import { Services } from '../service/services';
 import { Menu, MenuItem, Checkbox, TableRow, TableCell, TableHead, TableSortLabe, TablePaginationl, Snackbar, IconButton } from '@mui/material';
 import Scrollbar from '../components/scrollbar';
@@ -10,9 +10,8 @@ import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TablePaginationFeild from '../components/tablePagination';
 import MoreActionMenu from '../components/moreAction';
-import NoData from '../components/noData';
-
-
+import NoData from '../components/noData'; 
+import SnackbarContext from '../context/snackbar';
 
 export default function Index() {
 
@@ -20,11 +19,20 @@ export default function Index() {
   const loaderData = useRouteLoaderData('root');
   const navigate = useNavigate();
 
+  const { contextValue, updateSnackbar } = useContext(SnackbarContext)
+
   const [companyForm, setCompanyForm] = useState(false);
   const [companyList, setCompanyList] = useState([]);
   const [filterName, setFilterName] = useState('');
-  const [snackOpen, setSnackOpen] = useState(false);
 
+  const location = useLocation();
+  const [snackOpen, setSnackOpen] = useState(false);
+  const queryParams = new URLSearchParams(location.search);
+  const successMessage = queryParams.get('success') === '1' ? 'Company Updated Successfully' : false;
+
+  useEffect(()=>{
+    setSnackOpen(successMessage ? true : false);
+  },[successMessage])
   const [pagination, setPagination] = useState({
     rowsPerPage: 5,
     page: 0,
@@ -36,15 +44,31 @@ export default function Index() {
     if (reason === 'clickaway') {
       return;
     }
-    setSnackOpen(false);
+
+    setSnackOpen(false)
   };
 
   const handleChangeForm = () => {
     setCompanyForm(!companyForm);
   };
   useEffect(() => {
-    actiondata?.status && handleChangeForm()
-  }, [actiondata])
+    if(actiondata?.status){
+      handleChangeForm()
+      updateSnackbar({
+        ...contextValue,
+        open : true,
+        message : 'New Sub Company has been Created!'
+      });
+    }
+    if(successMessage){
+      updateSnackbar({
+        ...contextValue,
+        open : true,
+        message : successMessage
+      });
+    }
+
+  }, [actiondata, successMessage])
 
   // useEffect(() => {
   //   handleChangeForm()
@@ -85,6 +109,14 @@ export default function Index() {
     })
   };
 
+  const removeCompany = async (companyId) => {
+    let delRes = await Services.deleteCompany({
+      id : companyId
+    });
+
+    console.log(delRes);
+  }
+
 
 
   return (
@@ -102,8 +134,8 @@ export default function Index() {
       </Grid>
 
       <Box sx={{ width: '100%' }}>
-        <Snackbar
-          open={actiondata?.status}
+        {/* <Snackbar
+          open={snackOpen}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           autoHideDuration={3000}
           onClose={handleSnackbar}
@@ -111,9 +143,9 @@ export default function Index() {
           key={"top" + "right"}
         >
           <Alert onClose={handleSnackbar} severity="success" sx={{ width: '100%' }}>
-            Company has beeen Created
+            {contextValue?.message}
           </Alert>
-        </Snackbar>
+        </Snackbar> */}
 
         <TableContainer>
           <Table>
@@ -134,12 +166,12 @@ export default function Index() {
                   <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.subsidiarycompany}</TableCell>
                   <TableCell>{list?.contactno}</TableCell>
                   <TableCell>{list?.emailid}</TableCell>
-                  <TableCell sx={{ alignItems: 'center', display: 'flex' }}> <PlaceOutlinedIcon sx={{ opacity: .3 }} />{list?.street}, {list?.street}</TableCell>
+                  <TableCell sx={{ alignItems: 'center', display: 'flex' }}> <PlaceOutlinedIcon sx={{ opacity: .3 }} />{list?.street}, {list?.address}</TableCell>
                   <TableCell>
                     <Chip label={list?.status} size="small" variant="outlined" color="error" />
                   </TableCell>
                   <TableCell>
-                    <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
+                    <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} onDelete={()=> removeCompany(list?._id)} />
                   </TableCell>
                 </TableRow>
               ))}

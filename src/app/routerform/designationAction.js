@@ -54,9 +54,35 @@ const getDesigId = async ({ request, params : { id} }) => {
  }
 }
 
+const _update = async ({ request, params: { id } }) => {
+  let formData = await request.formData();
+  var object = {};
+  formData.forEach((value, key) => object[key] = value); 
+  // return 'updated';
+  try {
+    let data = await Services.updateDesig(id, object);
+    let pstatus = data?.status || [];
+    console.log(data?.data);
+    let obj = {
+      data: data?.data
+    }
+    return redirect('/designation?success=1')
+
+  } catch (error) {
+    console.log(error);
+    let obj = {
+      status: error.response?.status,
+      message: error?.response?.data?.message
+    }
+    return obj
+  }
+}
+
+
 const userActionForm = {
   createAction: create,
-  getDesignationId : getDesigId
+  getDesignationId : getDesigId,
+  updateDesignation : _update
 }
 
 export default userActionForm

@@ -4,6 +4,7 @@ import { loginService } from "../service/loginService"
 
 const login = async ({ request, params }) => {
 
+  return redirect('/')
   switch (request.method) {
     case "POST": {
       let formData = await request.formData();

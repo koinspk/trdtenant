@@ -16,16 +16,22 @@ import CompanyEdit from "./app/company/edit"
 import Login from "./app/login"
 import CompanyForm from './app/company/companyForm';
 import Users from './app/users';
+import UsersEdit from "./app/users/edit"
 import Truck from './app/truck';
+import TruckEdit from "./app/truck/edit"
 import Dashboard from './app/dashboard';
 import Roles from './app/setings/roles';
+import RolesEdit from './app/setings/roles/edit';
+import RolesAndPermission from './app/setings/roles/assign';
 import Designation from './app/setings/designation';
+import Edit from './app/setings/designation/edit';
 import Delivery from './app/deliveryplaning';
 import loginActionForm from "./app/routerform/loginaction"
 import companyActionForm from "./app/routerform/companyaction"
 import userActionForm from "./app/routerform/userAction"
 import roleActionForm from "./app/routerform/roleAction"
 import designationActionForm from "./app/routerform/designationAction"
+import truckActionForm from "./app/routerform/truckAction"
 import Profile from './app/profile'
 import axios from 'axios';
 
@@ -34,6 +40,7 @@ import axios from 'axios';
 axios.interceptors.request.use(
   (req) => {
     let _localStorage = localStorage.getItem("tsdrftoken")
+    console.log(_localStorage);
     if (_localStorage) {
       req.headers.authorization = `Bearer ${_localStorage}`
     }
@@ -85,31 +92,59 @@ const router = createBrowserRouter(
 
           <Route path="/" >
             <Route path="users" element={<Users />} action={userActionForm.createAction} />
-            <Route path=":id"
+            <Route path="users/edit/:id"
               id="user"
-              element={<Users />}
+              element={<UsersEdit />}
               loader={userActionForm.getUserId}
+              action={userActionForm.updateUser}
             />
           </Route>
 
-          <Route path="/truck">
-            <Route path="" element={<Truck />} />
+          <Route path="/truck" >
+            <Route index element={<Truck />}
+              action={truckActionForm.createAction} />
+            <Route path="edit/:id"
+              id="truck"
+              element={<TruckEdit />}
+              loader={truckActionForm.getTruckId}
+            />
           </Route>
 
-          <Route path="/setings">
+          {/* <Route path="/setings">
             <Route path="roles" element={<Roles />} action={roleActionForm.createAction} >
               <Route path=":id"
                 id="role"
                 element={<Roles />}
                 loader={roleActionForm.getRoleId}
               />
+              <Route path="edit/:id"
+              element={<RolesEdit />}
+              // loader={roleActionForm.getDesignationId}
+              // action={roleActionForm.updateDesignation}
+            />
+            </Route>
+          </Route> */}
+          <Route path="/setings">
+            <Route path="roles" element={<Roles />} action={roleActionForm.createAction}>
+              <Route path=":id" element={<Roles />} loader={roleActionForm.getRoleId} />
+              <Route path="edit/:id" element={<RolesEdit />} />
+            </Route>
+            <Route path="roles-permission" element={<RolesAndPermission />} action={roleActionForm.createAction}>
+              <Route path=":id" element={<Roles />} loader={roleActionForm.getRoleId} />
+              <Route path="edit/:id" element={<RolesEdit />} />
             </Route>
           </Route>
 
-          <Route path="/designation" element={<Designation />} action={designationActionForm.createAction} >
+          <Route path="/designation" >
+            <Route index element={<Designation />} action={designationActionForm.createAction} />
             <Route path=":id"
-              element={<Roles />}
+              element={<Designation />}
               loader={designationActionForm.getDesignationId}
+            />
+            <Route path="edit/:id"
+              element={<Edit />}
+              loader={designationActionForm.getDesignationId}
+              action={designationActionForm.updateDesignation}
             />
           </Route>
 

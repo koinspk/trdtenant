@@ -5,6 +5,7 @@ import { Grid } from '@mui/material';
 
 function CompanyEdit() {
     const loaderData = useLoaderData(); 
+    console.log(loaderData);
     return (
         <div className='mainwrapper'>
             <Box className="title_page" sx={{ mb: 2 }}>Update Company</Box>

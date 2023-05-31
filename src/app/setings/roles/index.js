@@ -97,6 +97,9 @@ function Index() {
                         navigate('/setings/roles')
                         handleChangeForm();
                     }} variant="outlined" className='add_btn'>Add Role</Button>
+                    <Button sx={{ ml: 2}} onClick={() => {
+                        navigate('/setings/roles-permission')
+                    }} variant="outlined" className='add_btn'>Assign Permission</Button>
                 </Grid>
             </Grid>
 

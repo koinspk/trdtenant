@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useLoaderData, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from 'react'
+import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, Grid, Modal, Backdrop, Box, Alert, Table, TableBody, TableContainer, TablePagination, Chip, Pagination } from '@mui/material'
 import { Form, useActionData, useRouteLoaderData } from 'react-router-dom';
@@ -12,6 +12,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoreActionMenu from '../components/moreAction';
 import PasswordInput from '../components/password';
 import NoData from '../components/noData';
+import SnackbarContext from '../context/snackbar';
 
 
 function Index() {
@@ -25,6 +26,11 @@ function Index() {
     const [snackOpen, setSnackOpen] = useState(false);
     const [companyList, setCompanyList] = useState(false);
 
+
+    const { contextValue, updateSnackbar } = useContext(SnackbarContext)
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const successMessage = queryParams.get('success') === '1' ? 'User Updated Successfully' : false;
 
     const [pagination, setPagination] = useState({
         rowsPerPage: 10,
@@ -41,9 +47,24 @@ function Index() {
     const handleChangeForm = () => {
         setCompanyForm(!companyForm);
     };
-    useEffect(() => {
-        actiondata?.status && handleChangeForm(false)
-    }, [actiondata])
+    
+  useEffect(() => {
+    if(actiondata?.status){
+      handleChangeForm()
+      updateSnackbar({
+        ...contextValue,
+        open : true,
+        message : 'New User has been Created!'
+      });
+    }
+    if(successMessage){
+      updateSnackbar({
+        ...contextValue,
+        open : true,
+        message : successMessage
+      });
+    }
+  }, [actiondata, successMessage])
 
     useEffect(() => {
         getListData();
@@ -109,18 +130,6 @@ function Index() {
             </Grid>
 
             <Box className="">
-                <Snackbar
-                    open={actiondata?.status}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    autoHideDuration={3000}
-                    onClose={handleSnackbar}
-                    message="Subsidiary Company Created"
-                    key={"top" + "right"}
-                >
-                    <Alert severity="success" sx={{ width: '100%' }}>
-                        User has beeen Created
-                    </Alert>
-                </Snackbar>
 
                 {/* <UserListToolbar
                     filterName={filterName}

@@ -58,12 +58,11 @@ function Index() {
             page: 1,
             pageSize: 10
         });
-        console.log(cdata);
         setCompanyList(cdata?.data?.items)
     }
 
     const getListData = async () => {
-        let listData = await Services.userList({
+        let listData = await Services.getTruckList({
             page: pagination?.page,
             pageSize: pagination?.rowsPerPage
         });
@@ -112,21 +111,31 @@ function Index() {
                         '& th': { backgroundColor: 'transparent' },
                     }}>
                         <TableCell sx={{ width: 50 }}> Sno </TableCell>
-                        <TableCell>Truck Name </TableCell>
-                        <TableCell>Truck No </TableCell>
-                        <TableCell>Vehicle Tyoe </TableCell>
+                        <TableCell> No</TableCell>
+                        <TableCell> Name </TableCell>
+                        <TableCell> Type </TableCell>
+                        <TableCell>Color</TableCell>
+                        <TableCell>Plate No</TableCell>
+                        <TableCell>Made By</TableCell>
+                        <TableCell>Model & Year</TableCell>
                         <TableCell>Driver</TableCell>
-                        <TableCell> Owned By </TableCell>
+                        <TableCell>Expire Date </TableCell>
+                        <TableCell> </TableCell>
                     </TableHead>
 
                     <TableBody>
                         {ListData.length > 0 && ListData.map((list, i) => (
                             <TableRow sx={{ '& td': { paddingY: 2, border: 0 }, '&:hover': { backgroundColor: '#F4F6F8' } }} >
                                 <TableCell>{i + 1}</TableCell>
-                                <TableCell sx={{ alignItems: 'center', display: 'flex' }}><img src={require('../../assets/users/user.png')} style={{ width: 30, height: 30, marginRight: 10 }} />{list?.first_name ?? '--'}</TableCell>
-                                <TableCell>{list?.mobile_number ?? '00000 00000'}</TableCell>
-                                <TableCell>{list?.email ?? '--'}</TableCell>
-                                <TableCell sx={{ alignItems: 'center', display: 'flex' }}> {list?.empno}</TableCell>
+                                <TableCell>{list?.vehicleNo ?? '--'}</TableCell>
+                                <TableCell>{list?.truckName ?? '00000 00000'}</TableCell>
+                                <TableCell>{list?.vehicleType ?? '--'}</TableCell>
+                                <TableCell > {list?.vehicleColor}</TableCell>
+                                <TableCell > {list?.plateNo}</TableCell>
+                                <TableCell > {list?.madeBy}</TableCell>
+                                <TableCell > {list?.model ?? '--'} {list?.year ?? '--'} </TableCell>
+                                <TableCell > {list?.driver}</TableCell>
+                                <TableCell > {list?.insuranceExpire}</TableCell>
                                 <TableCell sx={{ width: 60 }}>
                                     <MoreActionMenu editRowId={list?._id} openModal={handleChangeForm} />
                                 </TableCell>
@@ -163,25 +172,27 @@ function Index() {
                 >
                     <Box className="modal_wrapper">
                         <h2>Add Truck</h2>
-                        <Box style={{ height: 300, overflow: 'scroll' }}>
-                            <input type={'text'} placeholder="Truck Name" className='form-control' />
-                            <input type={'text'} placeholder="Vechicle No" className='form-control' />
-                            <input type={'text'} placeholder="Vechicle Type" className='form-control' />
-                            <input type={'text'} placeholder="Plate No" className='form-control' />
-                            <input type={'text'} placeholder="Plate No" className='form-control' />
-                            <input type={'text'} placeholder="Make" className='form-control' />
-                            <input type={'text'} placeholder="Modal" className='form-control' />
-                            <input type={'text'} placeholder="Year" className='form-control' />
-                            <input type={'text'} placeholder="Owned By" className='form-control' />
-                            <input type={'text'} placeholder="Insurance Expiry Date" className='form-control' />
-                            <input type={'text'} placeholder="Vehicle Color" className='form-control' />
-                            <input type={'text'} placeholder="Max Load Capacity" className='form-control' />
-                            <input type={'text'} placeholder="Max Speed" className='form-control' />
-                        </Box>
-                        <Box className='modalaction'>
-                            <Button onClick={handleChangeForm} className='btn cancel_btn'>Cancel</Button>
-                            <Button className='btn submit_btn'>Submit</Button>
-                        </Box>
+                        <Form method='post'>
+                            <Box style={{ height: 300, overflow: 'scroll' }}>
+                                <input type={'text'} name="vehicleNo" placeholder="Vehicle No" className='form-control' />
+                                <input type={'text'} name="truckName" placeholder="Truck Name" className='form-control' />
+                                <input type={'text'} name="vehicleType" placeholder="Vechicle Type" className='form-control' />
+                                <input type={'text'} name="color" placeholder="Vehicle Color" className='form-control' />
+                                <input type={'text'} name="plateNo" placeholder="Plate No" className='form-control' />
+                                <input type={'text'} name="madeBy" placeholder="Made By" className='form-control' />
+                                <input type={'text'} name="modal" placeholder="Modal" className='form-control' />
+                                <input type={'text'} name="year" placeholder="Year" className='form-control' />
+                                <input type={'text'} name="defaultDriver" placeholder="Driver" className='form-control' />
+                                <input type={'text'} name="ownedBy" placeholder="Owned By" className='form-control' />
+                                <input type={'text'} name="maxLoad" placeholder="Max Load Capacity" className='form-control' />
+                                <input type={'text'} name="maxSpeed" placeholder="Max Speed" className='form-control' />
+                                <input type={'text'} name="insuranceExpire" placeholder="Insurance Expiry Date" className='form-control' />
+                            </Box>
+                            <Box className='modalaction'>
+                                <Button onClick={handleChangeForm} className='btn cancel_btn'>Cancel</Button>
+                                <Button className='btn submit_btn' type='submit'>Submit</Button>
+                            </Box>
+                        </Form>
                     </Box>
                 </Modal>
             </Box>

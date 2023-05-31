@@ -7,10 +7,11 @@ const create = async ({ request, params }) => {
   switch (request.method) {
     case "POST": {
       let formData = await request.formData();
+      console.log(formData)
       var object = {};
       formData.forEach((value, key) => object[key] = value); 
       try {
-        let data = await Services.userCreate(object);
+        let data = await Services.createTruck(object);
         let pstatus = data?.status || [];
         console.log(data);
         if (pstatus == 200) {
@@ -19,7 +20,7 @@ const create = async ({ request, params }) => {
           }
           return obj
         }
-        return redirect('/users?success=1')
+        return redirect('/truck')
       } catch (error) {
         console.log(error);
         let obj = {
@@ -35,10 +36,9 @@ const create = async ({ request, params }) => {
   }
 }
 
-
-const getUserId = async ({ request, params : { id} }) => {
+const _getRoleId = async ({ request, params : { id} }) => {
   try {
-    let data =  await Services.getUserId({id : id});
+    let data =  await Services.getRoleId({id : id});
     let pstatus = data?.status || [];
     let obj = {
       data : data?.data
@@ -53,35 +53,9 @@ const getUserId = async ({ request, params : { id} }) => {
    return obj
  }
 }
-
-const _update = async ({ request, params: { id } }) => {
-  let formData = await request.formData();
-  console.log(formData);
-  var object = formData;
-  try {
-
-    let data = await Services.updateUser(id, object);
-    let pstatus = data?.status || [];
-    console.log(data?.data);
-    let obj = {
-      data: data?.data
-    }
-    return redirect('/users?success=1')
-
-  } catch (error) {
-    console.log(error);
-    let obj = {
-      status: error.response?.status,
-      message: error?.response?.data?.message
-    }
-    return obj
-  }
-}
-
-const designationActionForm = {
+const truckActionForm = {
   createAction: create,
-  getUserId: getUserId,
-  updateUser: _update
+  getRoleId : _getRoleId
 }
 
-export default designationActionForm
+export default truckActionForm

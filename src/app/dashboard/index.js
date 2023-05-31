@@ -1,5 +1,5 @@
 import { Box, Grid } from '@mui/material'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import StoreIcon from '@mui/icons-material/StoreOutlined';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttleOutlined';
@@ -15,6 +15,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import RevenueChart from './revenueChart';
+import { Services } from '../service/services';
 
 export const options = {
     responsive: true,
@@ -52,6 +53,29 @@ export const data = {
 
 
 function Index() {
+    const [dashboardData, setDashboardData ] = useState({
+        company : 0,
+        users : 0,
+        trucks : 0,
+        delivery : 0
+    });
+
+    useEffect(() => {
+        getCounts();
+    },[]);
+
+    const getCounts = async () => {
+        let data = await Services.getDashboard();
+        if(data?.status == 200){
+            setDashboardData({
+                ...dashboardData,
+                company : data?.data?.total
+            })
+        }
+
+        console.log(data)
+    }
+
     return (
         <Box className="dashboard dashboard_card" >
             <Grid container spacing={4}>
@@ -59,7 +83,7 @@ function Index() {
                     <Box className="card">
                         <Box className="card-content">
                             <StoreIcon className='icon' />
-                            <Box className="count">100</Box>
+                            <Box className="count">{ dashboardData.company ?? 0}</Box>
                             <Box className='title'>Sub Companies</Box>
                         </Box>
                     </Box>
